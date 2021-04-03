@@ -1,1 +1,8 @@
-{}
+{
+  "theme": {
+    "slug": "haludi-singl-page",
+    "name": "Single Page by Haludi",
+    "author": "Haludi",
+    "PHPNamespace": "haludi-singl-page"
+  }
+}
