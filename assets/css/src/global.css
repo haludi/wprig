@@ -35,6 +35,10 @@
  * Re: word-wrap: Many screen reader and browser combinations announce broken
  * words as they would appear visually.
  */
+body {
+	direction: rtl;
+}
+
 .screen-reader-text {
 	clip: rect(1px, 1px, 1px, 1px);
 	position: absolute !important;
@@ -77,7 +81,6 @@
 }
 
 @media (--sidebar-query) {
-
 	.has-sidebar .site {
 		margin: 0 1em;
 		display: grid;
@@ -210,7 +213,11 @@ select {
 
 .custom-logo-link {
 	display: inline-block;
-	margin: 0 auto 1em;
+}
+
+.custom-logo {
+	width: 75px;
+	height: 75px;
 }
 
 .site-branding {
@@ -269,14 +276,12 @@ select {
 }
 
 @media (--narrow-menu-query) {
-
 	.nav--toggle-small.nav--toggled-on .menu {
 		display: block;
 	}
 }
 
 @media (--wide-menu-query) {
-
 	.nav--toggle-small .menu-toggle {
 		display: none;
 	}
@@ -385,6 +390,18 @@ select {
 	font-stretch: condensed;
 }
 
+#site-navigation {
+	background-image: linear-gradient(
+		to right,
+		rgba(122, 81, 161, 0.7),
+		rgba(122, 81, 161, 0.3)
+	);
+}
+
+#navbarNavDropdown {
+	justify-content: flex-end;
+}
+
 .main-navigation a {
 	display: block;
 	width: 100%;
@@ -415,7 +432,6 @@ select {
 }
 
 @media (--wide-menu-query) {
-
 	.main-navigation ul li a {
 		padding: 0.4em 0.5em;
 	}
@@ -474,7 +490,6 @@ select {
 }
 
 @media (--content-query) {
-
 	.site-main .comment-navigation,
 	.site-main .posts-navigation,
 	.site-main .post-navigation,
@@ -585,7 +600,6 @@ select {
 .infinite-scroll .posts-navigation,
 .infinite-scroll .pagination,
 .infinite-scroll.neverending .site-footer {
-
 	/* Theme Footer (when set to scrolling) */
 	display: none;
 }

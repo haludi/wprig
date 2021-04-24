@@ -7,6 +7,8 @@
 
 namespace WP_Rig\WP_Rig;
 
+// TODO
+return;
 ?>
 
 <div class="site-branding">

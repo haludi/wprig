@@ -43,8 +43,30 @@ class Component implements Component_Interface, Templating_Component_Interface {
 	public function initialize() {
 		add_action( 'after_setup_theme', array( $this, 'action_register_nav_menus' ) );
 		add_filter( 'walker_nav_menu_start_el', array( $this, 'filter_primary_nav_menu_dropdown_symbol' ), 10, 4 );
+
+		add_filter( 'nav_menu_css_class', array( $this, 'filter_handler' ), 10, 4 );
+		add_filter( 'nav_menu_link_attributes', array( $this, 'add_class_to_all_menu_anchors' ), 10 );
 	}
 
+	/**
+	 * Apply bootstrap class to the <a> nav element.
+	 *
+	 * @param array $atts The HTML attributes applied to the menu item's <a> element.
+	 * @return array  Modified nav menu HTML.
+	 */
+	public function add_class_to_all_menu_anchors( $atts ) {
+		$atts['class'] = 'nav-link';
+		return $atts;
+	}
+
+	/**
+	 * Apply bootstrap class to the <li> nav element.
+	 *
+	 * @return array  Modified nav menu HTML.
+	 */
+	public function filter_handler() : array {
+		return array( 'nav-item' );
+	}
 	/**
 	 * Gets template tags to expose as methods on the Template_Tags class instance, accessible through `wp_rig()`.
 	 *
