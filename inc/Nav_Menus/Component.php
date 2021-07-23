@@ -7,9 +7,11 @@
 
 namespace WP_Rig\WP_Rig\Nav_Menus;
 
+use WP_Rig\WP_Rig\Nav_Menus\Single_Page_Walker_Nav_Menu;
 use WP_Rig\WP_Rig\Component_Interface;
 use WP_Rig\WP_Rig\Templating_Component_Interface;
 use WP_Post;
+use WP_Query;
 use function add_action;
 use function add_filter;
 use function register_nav_menus;
@@ -23,10 +25,12 @@ use function wp_nav_menu;
  * Exposes template tags:
  * * `wp_rig()->is_primary_nav_menu_active()`
  * * `wp_rig()->display_primary_nav_menu( array $args = array() )`
+ * * `wp_rig()->display_login_logout_nav_menu( array $args = array() )`
  */
 class Component implements Component_Interface, Templating_Component_Interface {
 
-	const PRIMARY_NAV_MENU_SLUG = 'primary';
+	const PRIMARY_NAV_MENU_SLUG      = 'primary';
+	const LOGIN_LOGOUT_NAV_MENU_SLUG = 'login-logout';
 
 	/**
 	 * Gets the unique identifier for the theme component.
@@ -44,8 +48,48 @@ class Component implements Component_Interface, Templating_Component_Interface {
 		add_action( 'after_setup_theme', array( $this, 'action_register_nav_menus' ) );
 		add_filter( 'walker_nav_menu_start_el', array( $this, 'filter_primary_nav_menu_dropdown_symbol' ), 10, 4 );
 
-		add_filter( 'nav_menu_css_class', array( $this, 'filter_handler' ), 10, 4 );
-		add_filter( 'nav_menu_link_attributes', array( $this, 'add_class_to_all_menu_anchors' ), 10 );
+		add_filter( 'wp_nav_menu_objects', array( $this, 'add_single_page_sections_to_menue' ), 10, 2 );
+	}
+
+	/**
+	 * Add child pages as menu items for single page menue.
+	 *
+	 * @param array    $items .
+	 * @param stdClass $args An object containing wp_nav_menu() arguments.
+	 * @return array  Modified nav menu HTML.
+	 */
+	public function add_single_page_sections_to_menue( $items, $args ) {
+		if ( ! ( isset( $args->single_page ) && $args->single_page ) ) {
+			return $items;
+		}
+
+		global $post;
+		$query_args = array(
+			'post_type'      => 'page',
+			'posts_per_page' => -1,
+			'post_parent'    => $post->ID,
+			'order'          => 'ASC',
+			'orderby'        => 'menu_order',
+		);
+
+		$parent = new WP_Query( $query_args );
+		global $wp;
+		$url = home_url( $wp->request );
+
+		$login = array_filter(
+			$items,
+			function ( $e ) {
+				return 'Login' === $e->title;
+			}
+		);
+
+		foreach ( $parent->posts as &$current_post ) {
+			$current_post->title = $current_post->post_title;
+			$current_post->url   = $url . '#' . $current_post->name;
+		}
+
+		$items = array_merge( $parent->posts, $items );
+		return $items;
 	}
 
 	/**
@@ -76,8 +120,9 @@ class Component implements Component_Interface, Templating_Component_Interface {
 	 */
 	public function template_tags() : array {
 		return array(
-			'is_primary_nav_menu_active' => array( $this, 'is_primary_nav_menu_active' ),
-			'display_primary_nav_menu'   => array( $this, 'display_primary_nav_menu' ),
+			'is_primary_nav_menu_active'    => array( $this, 'is_primary_nav_menu_active' ),
+			'display_primary_nav_menu'      => array( $this, 'display_primary_nav_menu' ),
+			'display_login_logout_nav_menu' => array( $this, 'display_login_logout_nav_menu' ),
 		);
 	}
 
@@ -87,7 +132,8 @@ class Component implements Component_Interface, Templating_Component_Interface {
 	public function action_register_nav_menus() {
 		register_nav_menus(
 			array(
-				static::PRIMARY_NAV_MENU_SLUG => esc_html__( 'Primary', 'wp-rig' ),
+				static::PRIMARY_NAV_MENU_SLUG      => esc_html__( 'Primary', 'wp-rig' ),
+				static::LOGIN_LOGOUT_NAV_MENU_SLUG => esc_html__( 'LoginLogout', 'wp-rig' ),
 			)
 		);
 	}
@@ -147,7 +193,28 @@ class Component implements Component_Interface, Templating_Component_Interface {
 			$args['container'] = '';
 		}
 
+		$args['walker'] = new Single_Page_Walker_Nav_Menu();
+
 		$args['theme_location'] = static::PRIMARY_NAV_MENU_SLUG;
+
+		wp_nav_menu( $args );
+	}
+
+	/**
+	 * Displays the login logout navigation menu.
+	 *
+	 * @param array $args Optional. Array of arguments. See `wp_nav_menu()` documentation for a list of supported
+	 *                    arguments.
+	 */
+	public function display_login_logout_nav_menu( array $args = array() ) {
+		if ( ! isset( $args['container'] ) ) {
+			$args['container'] = '';
+		}
+
+		$args['walker'] = new Single_Page_Walker_Nav_Menu();
+		$args['child_items_wrap'] = '<div id="%1$s" class="dropdown-menu %2$s">%3$s</ul>';
+
+		$args['theme_location'] = static::LOGIN_LOGOUT_NAV_MENU_SLUG;
 
 		wp_nav_menu( $args );
 	}

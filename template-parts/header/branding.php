@@ -7,7 +7,7 @@
 
 namespace WP_Rig\WP_Rig;
 
-// TODO
+// TODO.
 return;
 ?>
 

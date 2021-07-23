@@ -51,10 +51,20 @@ if ( ! wp_rig()->is_primary_nav_menu_active() ) {
 	</button>
 
 	<div class="collapse navbar-collapse" id="navbarNavDropdown">
-		<?php wp_rig()->display_primary_nav_menu(
+		<?php
+		wp_rig()->display_primary_nav_menu(
 			array(
 				'menu_id'         => 'primary-menu',
-				'menu_class'      => 'navbar-nav',
+				'menu_class'      => 'navbar-nav primary',
+				'single_page'     => true,
 			)
 		);
-?>
+		wp_rig()->display_login_logout_nav_menu(
+			array(
+				'menu_id'         => 'login-logout-menu',
+				'menu_class'      => 'navbar-nav login-logout-nav',
+			)
+		);
+		?>
+	</div>
+</nav>

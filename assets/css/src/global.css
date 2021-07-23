@@ -398,8 +398,13 @@ select {
 	);
 }
 
+ul.navbar-nav li {
+	margin: 0 1em;
+}
+
 #navbarNavDropdown {
-	justify-content: flex-end;
+	justify-content: space-between;
+	text-align: center;
 }
 
 .main-navigation a {
