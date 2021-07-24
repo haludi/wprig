@@ -63,6 +63,9 @@ class Component implements Component_Interface, Templating_Component_Interface {
 			return $items;
 		}
 
+		global $wp;
+		$url = home_url( $wp->request );
+
 		global $post;
 		$query_args = array(
 			'post_type'      => 'page',
@@ -73,22 +76,17 @@ class Component implements Component_Interface, Templating_Component_Interface {
 		);
 
 		$parent = new WP_Query( $query_args );
-		global $wp;
-		$url = home_url( $wp->request );
-
-		$login = array_filter(
-			$items,
-			function ( $e ) {
-				return 'Login' === $e->title;
-			}
-		);
-
-		foreach ( $parent->posts as &$current_post ) {
-			$current_post->title = $current_post->post_title;
-			$current_post->url   = $url . '#' . $current_post->name;
+		$single_page_sections = array( $post );
+		foreach ($parent->posts as $k => $v) {
+			array_push($single_page_sections, $v);
 		}
 
-		$items = array_merge( $parent->posts, $items );
+		foreach ( $single_page_sections as &$current_post ) {
+			$current_post->title = $current_post->post_title;
+			$current_post->url   = $url . '#' . $current_post->post_name;
+		}
+
+		$items = array_merge( $single_page_sections, $items );
 		return $items;
 	}
 

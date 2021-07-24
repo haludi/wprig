@@ -9,6 +9,8 @@
 
 namespace WP_Rig\WP_Rig;
 
+use WP_Query;
+
 get_header();
 
 // Use grid layout if blog index is displayed.
@@ -18,13 +20,30 @@ wp_rig()->print_styles( 'wp-rig-content', 'wp-rig-front-page' );
 	<main id="primary" class="site-main">
 		<?php
 
-		while ( have_posts() ) {
-			the_post();
+		global $post;
 
-			get_template_part( 'template-parts/content/entry', get_post_type() );
+		$query_args = array(
+			'post_type'      => 'page',
+			'posts_per_page' => -1,
+			'post_parent'    => $post->ID,
+			'order'          => 'ASC',
+			'orderby'        => 'menu_order',
+		);
+
+		$parent = new WP_Query( $query_args );
+
+		$items = array( $post );
+		foreach ($parent->posts as $k => $v) {
+			array_push($items, $v);
 		}
 
-		get_template_part( 'template-parts/content/pagination' );
+		$originalPost = $post;
+		foreach ( $items as &$current_post ) {
+			$post = $current_post;
+			get_template_part( 'template-parts/content/section', get_post_type() );
+		}
+		$post = $originalPost;
+
 		?>
 	</main><!-- #primary -->
 <?php
