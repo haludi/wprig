@@ -13,7 +13,7 @@ if ( ! wp_rig()->is_primary_nav_menu_active() ) {
 
 ?>
 
-<nav id="site-navigation" class="navbar navbar-expand-lg navbar-light bg-light" aria-label="<?php esc_attr_e( 'Main menu', 'wp-rig' ); ?>"
+<nav id="site-navigation" class="fixed-top navbar navbar-expand-lg navbar-light bg-light" aria-label="<?php esc_attr_e( 'Main menu', 'wp-rig' ); ?>"
 	<?php
 	if ( wp_rig()->is_amp() ) {
 		?>
